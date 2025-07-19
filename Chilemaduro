@@ -1,0 +1,101 @@
+-- Phoenix Script v2 - con TP y Noclip
+local p = game:GetService("Players").LocalPlayer
+local char = p.Character or p.CharacterAdded:Wait()
+local gui = Instance.new("ScreenGui", p:WaitForChild("PlayerGui"))
+gui.Name = "PhoenixScript"
+
+-- Frame principal
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 240, 0, 250)
+frame.Position = UDim2.new(0.7, 0, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(35, 0, 60)
+frame.Active = true
+frame.Draggable = true
+
+-- Título
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.BackgroundColor3 = Color3.fromRGB(20, 20, 60)
+title.Text = "🌟 Phoenix Script v2"
+title.TextScaled = true
+title.TextColor3 = Color3.fromRGB(0, 255, 150)
+title.Font = Enum.Font.GothamBold
+
+-- Botones
+local saveBtn = Instance.new("TextButton", frame)
+saveBtn.Position = UDim2.new(0, 20, 0, 40)
+saveBtn.Size = UDim2.new(0, 200, 0, 40)
+saveBtn.Text = "💾 Guardar Posición"
+saveBtn.BackgroundColor3 = Color3.fromRGB(60, 0, 120)
+saveBtn.TextColor3 = Color3.new(1, 1, 1)
+saveBtn.Font = Enum.Font.Gotham
+saveBtn.TextScaled = true
+
+local tpBtn = Instance.new("TextButton", frame)
+tpBtn.Position = UDim2.new(0, 20, 0, 90)
+tpBtn.Size = UDim2.new(0, 200, 0, 40)
+tpBtn.Text = "📍 Ir a Posición Guardada"
+tpBtn.BackgroundColor3 = Color3.fromRGB(0, 120, 200)
+tpBtn.TextColor3 = Color3.new(1, 1, 1)
+tpBtn.Font = Enum.Font.Gotham
+tpBtn.TextScaled = true
+
+local noclipBtn = Instance.new("TextButton", frame)
+noclipBtn.Position = UDim2.new(0, 20, 0, 140)
+noclipBtn.Size = UDim2.new(0, 200, 0, 40)
+noclipBtn.Text = "🧱 Activar Noclip"
+noclipBtn.BackgroundColor3 = Color3.fromRGB(0, 180, 100)
+noclipBtn.TextColor3 = Color3.new(1, 1, 1)
+noclipBtn.Font = Enum.Font.Gotham
+noclipBtn.TextScaled = true
+
+local status = Instance.new("TextLabel", frame)
+status.Position = UDim2.new(0, 20, 0, 190)
+status.Size = UDim2.new(0, 200, 0, 40)
+status.Text = "🛑 Estado: Esperando..."
+status.TextColor3 = Color3.new(1, 1, 1)
+status.BackgroundColor3 = Color3.fromRGB(0, 50, 50)
+status.Font = Enum.Font.GothamSemibold
+status.TextScaled = true
+
+-- Variables
+local savedPos = nil
+local noclipActive = false
+
+-- Función: Guardar posición
+saveBtn.MouseButton1Click:Connect(function()
+    local hrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+    if hrp then
+        savedPos = hrp.Position
+        status.Text = "✅ Posición guardada"
+    end
+end)
+
+-- Función: Teleport a posición guardada
+tpBtn.MouseButton1Click:Connect(function()
+    local hrp = p.Character and p.Character:FindFirstChild("HumanoidRootPart")
+    if hrp and savedPos then
+        hrp.CFrame = CFrame.new(savedPos)
+        status.Text = "📍 Teletransportado"
+    else
+        status.Text = "⚠️ No hay posición guardada"
+    end
+end)
+
+-- Función: Noclip
+noclipBtn.MouseButton1Click:Connect(function()
+    noclipActive = not noclipActive
+    status.Text = noclipActive and "🟢 Noclip activado" or "🔴 Noclip desactivado"
+    noclipBtn.Text = noclipActive and "❌ Desactivar Noclip" or "🧱 Activar Noclip"
+end)
+
+-- Noclip loop
+game:GetService("RunService").Stepped:Connect(function()
+    if noclipActive and p.Character then
+        for _, part in pairs(p.Character:GetDescendants()) do
+            if part:IsA("BasePart") and part.CanCollide then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
